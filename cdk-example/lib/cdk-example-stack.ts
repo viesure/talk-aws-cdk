@@ -2,6 +2,8 @@ import cdk = require('@aws-cdk/core');
 import lambda = require("@aws-cdk/aws-lambda");
 import dynamodb = require("@aws-cdk/aws-dynamodb");
 import apigateway = require("@aws-cdk/aws-apigateway");
+import sqs = require('@aws-cdk/aws-sqs');
+import lambdaEventSource = require("@aws-cdk/aws-lambda-event-sources");
 import {RemovalPolicy} from "@aws-cdk/core";
 
 export class CdkExampleStack extends cdk.Stack {
@@ -30,9 +32,22 @@ export class CdkExampleStack extends cdk.Stack {
             handler: storageFunction
         });
 
-        console.warn("Table Name: ", table.tableName);
-        console.warn("Storage Function Name", storageFunction.functionName);
-        console.warn("Api Gateway Id", api.restApiId);
-        console.warn("Api Gateway Url", api.url);
+        const queue = new sqs.Queue(this, 'storage-queue', {
+            queueName: 'storage-updates'
+        });
+
+        const proxyFunction = new lambda.Function(this, 'proxy-function', {
+            runtime: lambda.Runtime.NODEJS_8_10,
+            code: lambda.Code.fromAsset("./lambda"),
+            handler: "queue-proxy.handler",
+            environment: {
+                QUEUE_URL: queue.queueUrl
+            }
+        });
+        proxyFunction.addEventSource(new lambdaEventSource.DynamoEventSource(table, {
+            startingPosition: lambda.StartingPosition.TRIM_HORIZON
+        }));
+        queue.grantSendMessages(proxyFunction);
+
     }
 }

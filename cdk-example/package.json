@@ -23,6 +23,8 @@
     "@aws-cdk/aws-apigateway": "^1.14.0",
     "@aws-cdk/aws-dynamodb": "^1.14.0",
     "@aws-cdk/aws-lambda": "^1.14.0",
+    "@aws-cdk/aws-lambda-event-sources": "^1.14.0",
+    "@aws-cdk/aws-sqs": "^1.14.0",
     "@aws-cdk/core": "^1.14.0",
     "@types/node": "^12.11.7",
     "aws-sdk": "^2.556.0",
