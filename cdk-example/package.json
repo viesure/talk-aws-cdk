@@ -22,6 +22,9 @@
   "dependencies": {
     "@aws-cdk/aws-apigateway": "^1.14.0",
     "@aws-cdk/aws-dynamodb": "^1.14.0",
+    "@aws-cdk/aws-ec2": "^1.14.0",
+    "@aws-cdk/aws-ecs": "^1.14.0",
+    "@aws-cdk/aws-ecs-patterns": "^1.14.0",
     "@aws-cdk/aws-lambda": "^1.14.0",
     "@aws-cdk/aws-lambda-event-sources": "^1.14.0",
     "@aws-cdk/aws-sqs": "^1.14.0",

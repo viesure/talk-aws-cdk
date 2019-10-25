@@ -1,0 +1,31 @@
+spring:
+  jpa:
+    database: POSTGRESQL
+    show-sql: false
+    hibernate:
+      ddlAuto: none
+    properties.hibernate.temp.use_jdbc_metadata_defaults: false
+  datasource:
+    tomcat:
+      maxActive: 100
+      maxIdle: 4
+      minIdle: 1
+      validationQuery: SELECT 1
+      testOnBorrow: true
+      testWhileIdle: true
+      removeAbandoned: true
+      defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/postgres
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    platform: postgres
+    driverClassName: org.postgresql.Driver
+  flyway:
+    locations: classpath:/db/migration
+
+cloud:
+  aws:
+    stack:
+      auto: false
+    region:
+      static: eu-central-1
