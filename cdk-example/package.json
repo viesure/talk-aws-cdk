@@ -32,6 +32,7 @@
     "@aws-cdk/core": "^1.14.0",
     "@types/node": "^12.11.7",
     "aws-sdk": "^2.556.0",
+    "cdk-watchful": "^0.3.0",
     "source-map-support": "^0.5.9"
   }
 }

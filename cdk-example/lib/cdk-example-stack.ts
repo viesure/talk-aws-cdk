@@ -9,6 +9,7 @@ import ecs = require("@aws-cdk/aws-ecs");
 import rds = require("@aws-cdk/aws-rds");
 import ec2 = require("@aws-cdk/aws-ec2");
 import {RemovalPolicy} from "@aws-cdk/core";
+import {Watchful} from "cdk-watchful";
 
 export class CdkExampleStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -89,5 +90,9 @@ export class CdkExampleStack extends cdk.Stack {
         queue.grantConsumeMessages(legacyQueueProcessor.service.taskDefinition.taskRole);
         legacyDatabase.connections.allowFrom(legacyQueueProcessor.service, ec2.Port.tcp(5432), 'legacy service is allowed to access legacy database');
 
+        const metrics = new Watchful(this, 'metrics', {
+            alarmEmail: 'elias.draexler@viesure.io'
+        });
+        metrics.watchScope(this);
     }
 }
