@@ -26,5 +26,13 @@ export class CdkExampleStack extends cdk.Stack {
 
         table.grantReadWriteData(storageFunction);
 
+        const api = new apigateway.LambdaRestApi(this, 'storage-gateway', {
+            handler: storageFunction
+        });
+
+        console.warn("Table Name: ", table.tableName);
+        console.warn("Storage Function Name", storageFunction.functionName);
+        console.warn("Api Gateway Id", api.restApiId);
+        console.warn("Api Gateway Url", api.url);
     }
 }
