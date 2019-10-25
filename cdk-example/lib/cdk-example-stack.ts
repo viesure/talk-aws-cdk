@@ -6,6 +6,7 @@ import sqs = require('@aws-cdk/aws-sqs');
 import lambdaEventSource = require("@aws-cdk/aws-lambda-event-sources");
 import ecsPatterns = require("@aws-cdk/aws-ecs-patterns");
 import ecs = require("@aws-cdk/aws-ecs");
+import rds = require("@aws-cdk/aws-rds");
 import ec2 = require("@aws-cdk/aws-ec2");
 import {RemovalPolicy} from "@aws-cdk/core";
 
@@ -54,6 +55,19 @@ export class CdkExampleStack extends cdk.Stack {
 
         const vpc = new ec2.Vpc(this, 'vpd', {});
 
+        const dbUser = 'legacy';
+        const dbPassword = 'legacyPASSWORD';
+
+        const legacyDatabase = new rds.DatabaseInstance(this, 'legacy-database', {
+            engine: rds.DatabaseInstanceEngine.POSTGRES,
+            masterUsername: dbUser,
+            masterUserPassword: cdk.SecretValue.plainText(dbPassword),
+            instanceClass: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
+            vpc: vpc,
+            removalPolicy: RemovalPolicy.DESTROY, // SNAPSHOT currently not supported https://github.com/aws/aws-cdk/issues/3298,
+            deletionProtection: false
+        });
+
         const legacyQueueProcessor = new ecsPatterns.QueueProcessingFargateService(this, 'legacy-service', {
             image: ecs.AssetImage.fromAsset("./legacy-storage"),
             queue: queue,
@@ -65,9 +79,15 @@ export class CdkExampleStack extends cdk.Stack {
                 {lower: 50, change: +2} // add Tasks if load increases
             ],
             vpc: vpc,
-            enableLogging: true
+            enableLogging: true,
+            environment: {
+                "POSTGRES_USER": dbUser,
+                "POSTGRES_PASSWORD": dbPassword,
+                "POSTGRES_HOST": legacyDatabase.dbInstanceEndpointAddress
+            }
         });
         queue.grantConsumeMessages(legacyQueueProcessor.service.taskDefinition.taskRole);
+        legacyDatabase.connections.allowFrom(legacyQueueProcessor.service, ec2.Port.tcp(5432), 'legacy service is allowed to access legacy database');
 
     }
 }
