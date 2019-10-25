@@ -1,6 +1,7 @@
 import cdk = require('@aws-cdk/core');
 import lambda = require("@aws-cdk/aws-lambda");
 import dynamodb = require("@aws-cdk/aws-dynamodb");
+import apigateway = require("@aws-cdk/aws-apigateway");
 import {RemovalPolicy} from "@aws-cdk/core";
 
 export class CdkExampleStack extends cdk.Stack {
@@ -23,6 +24,7 @@ export class CdkExampleStack extends cdk.Stack {
             }
         });
 
+        table.grantReadWriteData(storageFunction);
 
     }
 }
